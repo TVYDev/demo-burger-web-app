@@ -4,6 +4,7 @@ import classes from './Button.module.css';
 
 const button = (props) => (
   <button
+    disabled={props.disabled}
     className={[classes.Button, classes[props.btnType]].join(' ')}
     onClick={props.onClick}
   >
@@ -12,8 +13,7 @@ const button = (props) => (
 );
 
 button.propTypes = {
-  btnType: PropTypes.oneOf(['Success', 'Danger']).isRequired,
-  onClick: PropTypes.func.isRequired
+  btnType: PropTypes.oneOf(['Success', 'Danger']).isRequired
 };
 
 export default button;
