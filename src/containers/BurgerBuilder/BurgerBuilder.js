@@ -7,20 +7,16 @@ import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import Spinner from '../../components/UI/Spinner/Spinner';
-import * as actionTypes from '../../store/actions';
+import * as actions from '../../store/actions/index';
 
 class BurgerBuilder extends React.Component {
   state = {
     purchasing: false,
-    loading: false,
-    error: false
+    loading: false
   };
 
   componentDidMount() {
-    // axios
-    //   .get('/ingredients.json')
-    //   .then((response) => this.setState({ ingredients: response.data }))
-    //   .catch((error) => this.setState({ error: true }));
+    this.props.onIngredientInit();
   }
 
   updatePurchaseableState = (ingredients) => {
@@ -43,27 +39,13 @@ class BurgerBuilder extends React.Component {
   };
 
   purchaseContinueHandler = () => {
+    this.props.onPurchaseInit();
     this.props.history.push('/checkout');
   };
 
-  renderOrderSummary = () => {
-    if (this.state.loading) {
-      return <Spinner />;
-    } else {
-      return (
-        <OrderSummary
-          ingredients={this.props.ingredients}
-          totalPrice={this.props.totalPrice}
-          onPurchaseCancel={this.purchaseCancelHandler}
-          onPurchaseContinue={this.purchaseContinueHandler}
-        />
-      );
-    }
-  };
-
   renderBurgerBuilder = () => {
-    const { purchasing, error } = this.state;
-    const { ingredients, totalPrice } = this.props;
+    const { purchasing } = this.state;
+    const { ingredients, totalPrice, error } = this.props;
 
     if (ingredients) {
       const disabledControlsInfo = { ...ingredients };
@@ -74,7 +56,12 @@ class BurgerBuilder extends React.Component {
       return (
         <React.Fragment>
           <Modal show={purchasing} onBackdropClick={this.purchaseCancelHandler}>
-            {this.renderOrderSummary()}
+            <OrderSummary
+              ingredients={this.props.ingredients}
+              totalPrice={this.props.totalPrice}
+              onPurchaseCancel={this.purchaseCancelHandler}
+              onPurchaseContinue={this.purchaseContinueHandler}
+            />
           </Modal>
           <Burger ingredients={ingredients} />
           <BuildControls
@@ -99,17 +86,20 @@ class BurgerBuilder extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    ingredients: state.ingredients,
-    totalPrice: state.totalPrice
+    ingredients: state.burgerBuilder.ingredients,
+    totalPrice: state.burgerBuilder.totalPrice,
+    error: state.burgerBuilder.error
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
     onIngredientAdded: (ingredientName) =>
-      dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName }),
+      dispatch(actions.addIngredient(ingredientName)),
     onIngredientRemoved: (ingredientName) =>
-      dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName })
+      dispatch(actions.removeIngredient(ingredientName)),
+    onIngredientInit: () => dispatch(actions.initIngredients()),
+    onPurchaseInit: () => dispatch(actions.purchaseInit())
   };
 };
 
