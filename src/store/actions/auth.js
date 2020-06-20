@@ -30,6 +30,10 @@ export const setAuthRedirectPath = (path) => {
 };
 
 export const authLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('expiresDate');
+    localStorage.removeItem('userId');
+
     return {
         type: actionTypes.AUTH_LOGOUT
     };
@@ -40,6 +44,28 @@ export const checkAuthExpired = (expirationTime) => {
         setTimeout(() => {
             dispatch(authLogout());
         }, expirationTime * 1000);
+    };
+};
+
+export const checkAuthState = () => {
+    return (dispatch) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            dispatch(authLogout());
+        } else {
+            const expiresDate = new Date(localStorage.getItem('expiresDate'));
+            if (expiresDate > new Date()) {
+                const userId = localStorage.getItem('userId');
+                dispatch(authSuccess(token, userId));
+                dispatch(
+                    checkAuthExpired(
+                        (expiresDate.getTime() - new Date().getTime()) / 1000
+                    )
+                );
+            } else {
+                dispatch(authLogout());
+            }
+        }
     };
 };
 
@@ -64,10 +90,18 @@ export const auth = (email, password, isSignup) => {
             .post(url, authData)
             .then((response) => {
                 console.log(response);
-                dispatch(
-                    authSuccess(response.data.idToken, response.data.localId)
+
+                const { idToken, expiresIn, localId } = response.data;
+                const expiresDate = new Date(
+                    new Date().getTime() + expiresIn * 1000
                 );
-                dispatch(checkAuthExpired(response.data.expiresIn));
+
+                localStorage.setItem('token', idToken);
+                localStorage.setItem('expiresDate', expiresDate);
+                localStorage.setItem('userId', localId);
+
+                dispatch(authSuccess(idToken, localId));
+                dispatch(checkAuthExpired(expiresIn));
             })
             .catch((err) => {
                 console.log(err);
