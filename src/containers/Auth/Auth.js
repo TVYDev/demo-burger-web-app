@@ -6,6 +6,7 @@ import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import * as actions from '../../store/actions/index';
+import { checkValidity } from '../../shared/validation';
 
 class Auth extends React.Component {
     state = {
@@ -47,32 +48,13 @@ class Auth extends React.Component {
         }
     }
 
-    checkValidity(value, rules) {
-        let isValid = true;
-        value = value.trim();
-
-        if (rules.required) {
-            isValid = value !== '' && isValid;
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid;
-        }
-
-        return isValid;
-    }
-
     inputChangedHandler = (event, inputIdentifier) => {
         const updatedControls = {
             ...this.state.controls,
             [inputIdentifier]: {
                 ...this.state.controls[inputIdentifier],
                 value: event.target.value,
-                valid: this.checkValidity(
+                valid: checkValidity(
                     event.target.value,
                     this.state.controls[inputIdentifier].validation
                 ),

@@ -7,6 +7,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/index';
+import { checkValidity } from '../../../shared/validation';
 
 class ContactData extends React.Component {
     state = {
@@ -81,25 +82,6 @@ class ContactData extends React.Component {
         isFormValid: false
     };
 
-    checkValidity(value, rules) {
-        let isValid = true;
-        value = value.trim();
-
-        if (rules.required) {
-            isValid = value !== '' && isValid;
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid;
-        }
-
-        return isValid;
-    }
-
     orderHandler = (event) => {
         event.preventDefault();
         const formData = {};
@@ -122,7 +104,7 @@ class ContactData extends React.Component {
         const clonedOrderForm = { ...this.state.orderForm };
         const clonedFormElement = { ...clonedOrderForm[inputIdentifier] };
         clonedFormElement.value = event.target.value;
-        clonedFormElement.valid = this.checkValidity(
+        clonedFormElement.valid = checkValidity(
             clonedFormElement.value,
             clonedFormElement.validation
         );

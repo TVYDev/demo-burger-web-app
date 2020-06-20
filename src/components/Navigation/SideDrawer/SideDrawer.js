@@ -18,7 +18,10 @@ const sideDrawer = (props) => {
                 show={!props.isSideDrawerClosed}
                 onClick={props.onSideDrawerClosed}
             />
-            <div className={siderDrawerClasses.join(' ')}>
+            <div
+                className={siderDrawerClasses.join(' ')}
+                onClick={props.onSideDrawerClosed}
+            >
                 <div className={classes.Logo}>
                     <Logo />
                 </div>
