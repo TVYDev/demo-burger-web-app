@@ -22,6 +22,13 @@ export const authFail = (error) => {
     };
 };
 
+export const setAuthRedirectPath = (path) => {
+    return {
+        type: actionTypes.SET_AUTH_REDIRECT_PATH,
+        path
+    };
+};
+
 export const authLogout = () => {
     return {
         type: actionTypes.AUTH_LOGOUT
